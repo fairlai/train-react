@@ -8,7 +8,7 @@ let i = 0;
 export default class TodoList extends React.Component {
 
   state = {
-    list: [{id: 0, content: 'hehe', finish: true, isShow:true}],
+    list: [{id: 0, content: 'hehe', finish: true}],
     value: '',
     status:'all',
     searchValue:'',
@@ -23,7 +23,7 @@ export default class TodoList extends React.Component {
     if (value === '') {
       return
     }
-    const newList = [...list, {content: value, finish: false, id: ++i, isShow:true}];
+    const newList = [...list, {content: value, finish: false, id: ++i}];
     this.setState({list: newList, value: ''});
   };
 
@@ -50,16 +50,9 @@ export default class TodoList extends React.Component {
 
   handleSearchInput = (e) => {
     const searchValue = e.target.value;
-    const list = this.state.list.map(item => {
-      item.isShow = false;
-      if(item.content.indexOf(searchValue)>-1){
-        return {...item, isShow:true}
-      }
-      return item;
-    });
     this.setState({
       searchValue,
-      list
+      // list
     })
   };
   render() {
@@ -90,25 +83,23 @@ export default class TodoList extends React.Component {
           value={searchValue.slice(0, 20)}
         />
         {
+
           list.filter(item=>{
             if(status === 'all'){
               return true
             }else if (status === 'finished') {
               return item.finish
-            }else{
+            }else {
               return !item.finish
             }
-          }).map(item => {
-            return (
-              item.isShow &&
+          }).map(item =>
+            item.content.indexOf(searchValue)>-1 &&
               <TodoItem
                 item={item}
                 key={item.id}
                 handleRemove={this.handleRemove}
                 handleToggle={this.handleToggle}
               />
-            )
-          }
           )
         }
 
