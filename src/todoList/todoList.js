@@ -83,7 +83,6 @@ export default class TodoList extends React.Component {
           value={searchValue.slice(0, 20)}
         />
         {
-
           list.filter(item=>{
             if(status === 'all'){
               return true
@@ -92,17 +91,18 @@ export default class TodoList extends React.Component {
             }else {
               return !item.finish
             }
-          }).map(item =>
-            item.content.indexOf(searchValue)>-1 &&
-              <TodoItem
-                item={item}
-                key={item.id}
-                handleRemove={this.handleRemove}
-                handleToggle={this.handleToggle}
-              />
+          }).filter(
+            item=> item.content.indexOf(searchValue)>-1
+          ).map(item =>
+            // item.content.indexOf(searchValue)>-1 &&
+            <TodoItem
+              item={item}
+              key={item.id}
+              handleRemove={this.handleRemove}
+              handleToggle={this.handleToggle}
+            />
           )
         }
-
       </div>
     )
   }
