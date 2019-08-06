@@ -1,85 +1,36 @@
 import React from 'react';
 import TodoItem from './todoItem/todoItem';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import './todoList.css'
+import {handleInput, handleAdd, handleRemove, handleToggle, handleSearchInput, handleStatus} from '../action/toDoListAction'
 
-let i = 0;
-
-
-export default class TodoList extends React.Component {
-
-  state = {
-    list: [{id: 0, content: 'hehe', finish: true}],
-    value: '',
-    status:'all',
-    searchValue:'',
-  };
-
-  handleInput = (event) => {
-    this.setState({value: event.target.value})
-  };
-
-  handleAdd = () => {
-    const {value, list} = this.state;
-    if (value === '') {
-      return
-    }
-    const newList = [...list, {content: value, finish: false, id: ++i}];
-    this.setState({list: newList, value: ''});
-  };
-
-  handleRemove = (id) => {
-    const list = this.state.list.filter(item => item.id !== id);
-    this.setState({list})
-  };
-
-  handleToggle = (id) => {
-    const list = this.state.list.map(item => {
-      if (item.id === id) {
-        return {
-          ...item, finish: !item.finish
-        }
-      }
-      return item;
-    });
-    this.setState({list})
-  };
-
-  handleStatus = (status) => {
-    this.setState({status})
-  };
-
-  handleSearchInput = (e) => {
-    const searchValue = e.target.value;
-    this.setState({
-      searchValue,
-      // list
-    })
-  };
+class TodoList extends React.Component {
   render() {
-    const {value, list, status, searchValue} = this.state;
+    const {value, list, status, searchValue, handleInput, handleAdd, handleRemove, handleToggle, handleSearchInput, handleStatus} = this.props;
     return (
       <div className={'todo-list'}>
         <input
           type="text"
           className={'todo-list-input'}
-          onChange={this.handleInput}
+          onChange={handleInput.bind(this)}
           value={value.slice(0, 20)}
         />
         <button
           className={'button'}
-          onClick={this.handleAdd}
+          onClick={handleAdd}
         >
           新增
         </button>
         <div className={'button-group'}>
-          <button onClick={this.handleStatus.bind(null, 'all')}>全部</button>
-          <button onClick={this.handleStatus.bind(null,'finished')}>已完成</button>
-          <button onClick={this.handleStatus.bind(null,'unfinishde')}>未完成</button>
+          <button onClick={handleStatus.bind(this,'all')}>全部</button>
+          <button onClick={handleStatus.bind(this,'finished')}>已完成</button>
+          <button onClick={handleStatus.bind(this,'unfinishde')}>未完成</button>
         </div>
         <input
           type="text"
           className={'todo-list-input'}
-          onChange={this.handleSearchInput}
+          onChange={handleSearchInput.bind(this)}
           value={searchValue.slice(0, 20)}
         />
         {
@@ -94,12 +45,11 @@ export default class TodoList extends React.Component {
           }).filter(
             item=> item.content.indexOf(searchValue)>-1
           ).map(item =>
-            // item.content.indexOf(searchValue)>-1 &&
             <TodoItem
               item={item}
               key={item.id}
-              handleRemove={this.handleRemove}
-              handleToggle={this.handleToggle}
+              handleRemove={handleRemove.bind(this,item.id)}
+              handleToggle={handleToggle.bind(this,item.id)}
             />
           )
         }
@@ -108,3 +58,13 @@ export default class TodoList extends React.Component {
   }
 }
 
+const mapStateToProps = state => {
+  const {value, list, status, searchValue} = state.toDoListReducer;
+  return {value, list, status, searchValue}
+};
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  handleInput, handleAdd, handleRemove, handleToggle, handleSearchInput, handleStatus
+}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList);
